@@ -11,7 +11,7 @@ export class KafkaService implements OnModuleInit {
   constructor() {
     this.kafka = new Kafka({
       clientId: 'MisaFiles',
-      brokers: [`localhost:9092`]
+      brokers: [`${process.env.KAFKA_HOST}:9092`]
     });
     this.consumer = this.kafka.consumer({groupId: 'misa-files-group'});
   }
