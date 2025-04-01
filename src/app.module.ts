@@ -4,6 +4,10 @@ import { AppService } from './app.service';
 import { KafkaModule } from './kafka/kafka.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { FilesModule } from './files/files.module';
+import { File } from './files/entities/file.entity';
+import { FoldersModule } from './folders/folders.module';
+import { Folder } from './folders/entities/folder.entity';
 
 @Module({
   imports: [
@@ -16,7 +20,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [], // Указываем сущности
+        entities: [File, Folder], // Указываем сущности
         schema: configService.get('DB_SCHEMA'),
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE'), // Для разработки можно оставить true
         autoLoadEntities: true,
@@ -24,7 +28,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       }),
       inject: [ConfigService],
     } as any),
-    KafkaModule
+    KafkaModule,
+    FilesModule,
+    FoldersModule
   ],
   controllers: [AppController],
   providers: [AppService],

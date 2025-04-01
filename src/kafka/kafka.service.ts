@@ -18,14 +18,14 @@ export class KafkaService implements OnModuleInit {
 
   async onModuleInit() {
     // try {
-      await this.consumer.connect();
-      await this.consumer.subscribe({ topic: 'file-uploaded', fromBeginning: true });
-    //
-      await this.consumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-          console.log(`Received message: ${message?.value?.toString()}; topic: ${topic}`);
-        }
-      });
+    //   await this.consumer.connect();
+    //   await this.consumer.subscribe({ topic: 'file-uploaded', fromBeginning: true });
+    // //
+    //   await this.consumer.run({
+    //     eachMessage: async ({ topic, partition, message }) => {
+    //       console.log(`Received message: ${message?.value?.toString()}; topic: ${topic}`);
+    //     }
+    //   });
     // } catch (error) {
     //   console.log(error);
     // }
