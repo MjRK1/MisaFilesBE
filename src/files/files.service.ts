@@ -63,7 +63,8 @@ export class FilesService {
       folder: folder ?? null,
     });
 
-    return this.fileRepository.save(newFile);
+    await this.fileRepository.save(newFile);
+    return await this.fileRepository.find({});
   }
 
 
