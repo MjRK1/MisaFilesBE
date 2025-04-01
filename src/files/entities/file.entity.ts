@@ -7,7 +7,7 @@ export class File {
   id: string;
 
   @Column()
-  name: string
+  name: string;
 
   @Column()
   size: number;

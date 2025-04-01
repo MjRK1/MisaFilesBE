@@ -21,7 +21,7 @@ export class FoldersService {
         name: createFolderDto.name,
         parentFolderId: createFolderDto?.parentFolderId ?? null
       }
-    })
+    });
     if (folderWithName?.length) {
       return new BadRequestException(`Folder with name "${createFolderDto.name} is already exist!`);
     }
@@ -36,18 +36,18 @@ export class FoldersService {
       name: folder.name,
       parentFolderId: folder.parentFolderId,
       id: folder.id
-    }
+    };
   }
 
   async getRootFolders(userId: string): Promise<IResponseFolder[]> {
     const folders = await this.folderRepository.find({
       where: { userId, parentFolderId: IsNull() },
-    })
+    });
     return folders.map(folder => ({
       id: folder.id,
       name: folder.name,
       parentFolderId: folder.parentFolderId ?? null,
-    }))
+    }));
   }
 
   async getFolderContents(userId: string, folderId?: string) {
@@ -70,7 +70,7 @@ export class FoldersService {
         size: file.size,
         createdAt: file.createdAt,
       }))
-    }
+    };
   }
 
   async deleteFolder(userId: string, folderId: string) {
@@ -85,7 +85,7 @@ export class FoldersService {
     }
 
     await this.folderRepository.delete(folderId);
-    return {message: `Folder deleted successfully`}
+    return {message: `Folder deleted successfully`};
   }
 
   async renameFolder(userId: string, folderId: string, newName: string) {
@@ -94,7 +94,7 @@ export class FoldersService {
         userId,
         id: folderId
       }
-    })
+    });
 
     if (!folder) {
       throw new BadRequestException(`Folder ${folderId} not found`);
@@ -114,7 +114,7 @@ export class FoldersService {
         userId,
         id: folderId
       }
-    })
+    });
     if (!folder) {
       throw new BadRequestException(`Folder ${folderId} not found`);
     }

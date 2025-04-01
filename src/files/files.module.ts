@@ -18,7 +18,7 @@ import * as fs from 'node:fs';
     MulterModule.register({
       storage: diskStorage({
         destination: (req, file, cb) => {
-          const userId = req.params.userId;
+          const {userId} = req.params;
           const uploadPath = path.join('../uploads', userId);
           // Проверяем и создаем директорию, если её нет
           if (!fs.existsSync(uploadPath)) {

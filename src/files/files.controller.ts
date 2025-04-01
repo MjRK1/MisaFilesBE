@@ -52,7 +52,7 @@ export class FilesController {
       'Content-Type': `image/${file.name}`,
       'Content-Disposition': `attachment; filename="${file.name}"`,
     });
-    return res.sendFile(path.resolve(file.path))
+    return res.sendFile(path.resolve(file.path));
   }
 
   @Get(':fileId/thumb')
@@ -70,7 +70,6 @@ export class FilesController {
         'Content-Type': `image/${thumbnailName.split('.')[1]}`,
         'Content-Disposition': `attachment; filename="${thumbnailName}"`,
     });
-    return res.sendFile(path.resolve(file.thumbnailPath))
+    return res.sendFile(path.resolve(file.thumbnailPath));
   }
-
 }

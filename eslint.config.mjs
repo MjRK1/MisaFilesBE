@@ -25,7 +25,7 @@ const config = {
     'no-mixed-operators': 'error',
     'prefer-arrow-callback': 'error',
     'array-callback-return': 'error',
-    'no-use-before-define': 'no',
+    'no-use-before-define': 'off',
     'one-var-declaration-per-line': 'error',
     'no-loop-func': 'error',
     'implicit-arrow-linebreak': ['error', 'beside'],
