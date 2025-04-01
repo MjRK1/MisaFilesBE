@@ -16,6 +16,10 @@ import * as fs from 'node:fs';
   imports: [
     TypeOrmModule.forFeature([File, Folder]),
     MulterModule.register({
+      fileFilter: (_, file, cb) => {
+        file.originalname = Buffer.from(file.originalname, 'ascii').toString('utf8');
+        cb(null, true);
+      },
       storage: diskStorage({
         destination: (req, file, cb) => {
           const {userId} = req.params;
