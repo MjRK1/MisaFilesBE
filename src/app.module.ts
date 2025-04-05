@@ -8,6 +8,8 @@ import { FilesModule } from './files/files.module';
 import { File } from './files/entities/file.entity';
 import { FoldersModule } from './folders/folders.module';
 import { Folder } from './folders/entities/folder.entity';
+import { AuthGuard } from './auth/auth.guard';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -30,9 +32,16 @@ import { Folder } from './folders/entities/folder.entity';
     } as any),
     KafkaModule,
     FilesModule,
-    FoldersModule
+    FoldersModule,
+    HttpModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: "APP_GUARD",
+      useClass: AuthGuard
+    }
+  ],
 })
 export class AppModule {}

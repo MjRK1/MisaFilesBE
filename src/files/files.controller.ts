@@ -7,7 +7,7 @@ import {
   UploadedFile,
   Get,
   NotFoundException,
-  Res
+  Res, UseGuards, Req,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -15,8 +15,10 @@ import { Response } from 'express';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { IResponseFile } from '../types/files/files';
+import { AuthGuard } from '../auth/auth.guard';
 
-@Controller(':userId/files')
+// @UseGuards(AuthGuard)
+@Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
@@ -25,28 +27,28 @@ export class FilesController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFiles(
     @Body() body: { folderId: string | null },
-    @Param('userId') userId: string,
+    @Req() req: Request,
     @UploadedFile() file: Express.Multer.File
   ) {
-    return this.filesService.uploadFile(userId, file, body?.folderId ?? null);
+    return this.filesService.uploadFile(req['user'].sub, file, body?.folderId ?? null);
   }
 
   @Get()
   async getRootFiles(
-    @Param('userId') userId: string
+    @Req() req: Request,
   ): Promise<IResponseFile[]> {
-    return this.filesService.getRootFiles(userId);
+    return this.filesService.getRootFiles(req['user'].sub);
   }
 
   @Get(':fileId')
   async getFileImage(
-    @Param('userId') userId: string,
+    @Req() req: Request,
     @Param('fileId') fileId: string,
     @Res() res: Response
   ) {
-    const file = await this.filesService.getFileById(userId, fileId);
+    const file = await this.filesService.getFileById(req['user'].sub, fileId);
     if (!file) {
-      return new NotFoundException('File not found');
+      throw new NotFoundException('File not found');
     }
     res.set({
       'Content-Type': `image/${file.name}`,
@@ -57,13 +59,13 @@ export class FilesController {
 
   @Get(':fileId/thumb')
   async getThumbnail(
-    @Param('userId') userId: string,
+    @Req() req: Request,
     @Param('fileId') fileId: string,
     @Res() res: Response
   ) {
-    const file = await this.filesService.getFileById(userId, fileId);
+    const file = await this.filesService.getFileById(req['user'].sub, fileId);
     if (!file) {
-      throw new NotFoundException('File not found.');
+      throw new NotFoundException('Thumb not found.');
     }
     const thumbnailName = file.thumbnailPath.split('/')[file.thumbnailPath.split('.').length - 1];
     res.set({

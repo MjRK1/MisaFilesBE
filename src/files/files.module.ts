@@ -8,6 +8,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
+import { HttpModule } from '@nestjs/axios';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Module({
   controllers: [FilesController],
@@ -36,7 +38,8 @@ import * as fs from 'node:fs';
           cb(null, `${path.parse(file.originalname).name}-${uniqueSuffix}${ext}`);
         }
       })
-    })
+    }),
+    HttpModule,
   ],
 
 })

@@ -19,7 +19,7 @@ export class FilesService {
 
   async getRootFiles(userId: string): Promise<IResponseFile[]> {
     const files = await this.fileRepository.find({
-      where: {userId, folder: null}
+      where: { userId, folder: null },
     });
     return files.map(file => ({
       id: file.id,
@@ -31,14 +31,14 @@ export class FilesService {
   }
 
   async uploadFile(userId: string, file: Express.Multer.File, folderId?: string | null) {
-;
     const filePath = path.join('../uploads', userId, file?.filename);
     let folder: Folder | null = null;
     if (folderId && typeof folderId === 'string') {
       folder = await this.folderRepository.findOne({
-          where: {
-            id: folderId, userId: userId
-          }
+        where: {
+          id: folderId,
+          userId: userId,
+        },
       });
     }
     let thumbnailPath: string | null = null;
@@ -67,8 +67,7 @@ export class FilesService {
     return await this.fileRepository.find({});
   }
 
-
   async getFileById(userId: string, fileId: string) {
-    return await this.fileRepository.findOne({where: {userId, id: fileId}});
+    return await this.fileRepository.findOne({ where: { userId, id: fileId } });
   }
 }
