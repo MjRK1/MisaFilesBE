@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { FoldersService } from './folders.service';
 import { CreateFolderDto } from './dto/create-folder.dto';
 
@@ -11,14 +11,13 @@ export class FoldersController {
     @Body() createFolderDto: CreateFolderDto,
     @Req() req: Request,
   ) {
-    return this.foldersService.createFolder(createFolderDto, req['user'].sub);
+    return this.foldersService.createFolder(createFolderDto, String(req['user'].sub));
   }
 
-  @Get(':folderId')
+  @Get('')
   getFolderContents(
-    @Param('userId') userId: string,
     @Req() req: Request,
-    @Param('folderId') folderId?: string
+    @Query('folderId') folderId?: string
   ) {
     return this.foldersService.getFolderContents(req['user'].sub, folderId);
   }
@@ -33,26 +32,26 @@ export class FoldersController {
 
   @Post(':folderId/rename')
   renameFolder(
-    @Body() newName: string,
+    @Body() body: {newName: string},
     @Req() req: Request,
     @Param('folderId') folderId: string
   ) {
-    return this.foldersService.renameFolder(req['user'].sub, folderId, newName);
+    return this.foldersService.renameFolder(req['user'].sub, folderId, body.newName);
   }
 
-  @Post(':folderId/move')
+  @Post('move')
   moveFolder(
     @Req() req: Request,
-    @Param('folderId') folderId: string,
-    @Body() newParentFolderId: string,
+    @Body() body: {newParentFolderId?: string | null, folderId: string},
   ) {
-    return this.foldersService.moveFolder(req['user'].sub, folderId, newParentFolderId);
+    return this.foldersService.moveFolder(req['user'].sub, body.folderId, body.newParentFolderId);
   }
 
-  @Get('')
-  getRootFolders(
+  @Get('resolve')
+  resolvePath(
     @Req() req: Request,
+    @Query('path') path: string
   ) {
-    return this.foldersService.getRootFolders(req['user'].sub);
+    return this.foldersService.resolvePath(req['user'].sub, path);
   }
 }

@@ -9,7 +9,7 @@ import { diskStorage } from 'multer';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { HttpModule } from '@nestjs/axios';
-import { AuthGuard } from '../auth/auth.guard';
+import { Request } from 'express';
 
 @Module({
   controllers: [FilesController],
@@ -23,8 +23,9 @@ import { AuthGuard } from '../auth/auth.guard';
         cb(null, true);
       },
       storage: diskStorage({
-        destination: (req, file, cb) => {
-          const {userId} = req.params;
+        destination: (req: Request, file, cb) => {
+          //@ts-ignore
+          const userId: string = `${req['user']?.sub}`;
           const uploadPath = path.join('../uploads', userId);
           // Проверяем и создаем директорию, если её нет
           if (!fs.existsSync(uploadPath)) {

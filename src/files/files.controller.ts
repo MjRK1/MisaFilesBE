@@ -4,18 +4,16 @@ import {
   Body,
   Param,
   UseInterceptors,
-  UploadedFile,
+  UploadedFiles,
   Get,
   NotFoundException,
-  Res, UseGuards, Req,
+  Res, Req, Delete,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import * as path from 'node:path';
-import * as fs from 'node:fs';
 import { IResponseFile } from '../types/files/files';
-import { AuthGuard } from '../auth/auth.guard';
 
 // @UseGuards(AuthGuard)
 @Controller('files')
@@ -24,13 +22,13 @@ export class FilesController {
 
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('files'))
   async uploadFiles(
     @Body() body: { folderId: string | null },
     @Req() req: Request,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFiles() files: Express.Multer.File[]
   ) {
-    return this.filesService.uploadFile(req['user'].sub, file, body?.folderId ?? null);
+    return this.filesService.uploadFile(String(req['user'].sub), files, JSON.parse(body.folderId ?? null));
   }
 
   @Get()
@@ -69,9 +67,44 @@ export class FilesController {
     }
     const thumbnailName = file.thumbnailPath.split('/')[file.thumbnailPath.split('.').length - 1];
     res.set({
-        'Content-Type': `image/${thumbnailName.split('.')[1]}`,
-        'Content-Disposition': `attachment; filename="${thumbnailName}"`,
+        'Content-Type': `image/${thumbnailName.split('.')[thumbnailName.split('.')?.length - 1]}`,
+        'Content-Disposition': `attachment; filename="thumb"`,
     });
     return res.sendFile(path.resolve(file.thumbnailPath));
+  }
+
+  @Delete(':fileId')
+  async deleteFile(
+    @Req() req: Request,
+    @Param('fileId') fileId: string
+  ) {
+    return this.filesService.deleteFile(req['user'].sub, fileId);
+  }
+
+  @Get('download/:fileId')
+  async downloadFile(
+    @Req() req: Request,
+    @Param('fileId') fileId: string,
+    @Res() res: Response
+  ) {
+    const userId = String(req['user'].sub);
+
+    const file = await this.filesService.getFileForDownload(userId, fileId);
+    res.set({
+      'Content-Type': file.mimeType,
+    });
+    const absolutePath = path.resolve(file.path);
+    res.download(absolutePath, file.name, (err) => {
+      if (err) {
+        res.status(500).send('Не удалось скачать файл');
+      }
+    });
+  }
+
+  @Post('move')
+  async moveFile(
+    @Req() req: Request,
+    @Body() body: { fileId: string, folderId?: string | null}) {
+    return await this.filesService.moveFile(req['user'].sub, body.fileId, body?.folderId)
   }
 }
